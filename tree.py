@@ -37,6 +37,7 @@ class Map:
           continue
         distance = city1.distanceTo(city2)
         self.distances[(city1.name, city2.name)] = distance
+        self.distances[(city2.name, city1.name)] = distance
   
   # Get the distance between two cities      
   def get_distance(self, cityName1 : str, cityName2: str) -> float:
@@ -82,7 +83,7 @@ class State:
         newPath = self.path.copy()
         newPath.append(startCity)
         startCity = next(city for city in map.cities if city.name == startCity)
-        newState = State(map.cities[0], self.visited, newPath, self.cost + distance)
+        newState = State(startCity, self.visited, newPath, self.cost + distance)
         yield (startCity,newState)
 
 @dataclass

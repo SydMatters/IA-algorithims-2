@@ -14,48 +14,47 @@ class PriorityNode:
 This function receives a map and a start city and returns the path to the goal city using the
 A* algorithm with the minimum spanning tree heuristic.
 '''  
-def aStarMST(map : Map, startCity: str):
-  #Find the start city in the map
+def aStarMST(map: Map, startCity: str):
+  # Find the start city in the map
   start = next(city for city in map.cities if city.name == startCity)
-  #Create the initial state and node
-  initialState = State(city= start, visited=set([start.name]), path=[start.name], cost=0.0)
+  # Create the initial state and node
+  initialState = State(city=start, visited={start.name}, path=[start.name], cost=0.0)
   initialNode = Node(parent=None, state=initialState, action=None, depth=0)
   
-  #Create the frontier and add the initial node
+  # Create the frontier and add the initial node
   frontier = []
-  #Calculate the priority of the initial node
+  # Calculate the priority of the initial node
   initialPriority = minimumSpanningTree(map.cities, initialState.visited) + initialNode.state.cost
-  #Add the initial node to the frontier
+  # Add the initial node to the frontier
   heapq.heappush(frontier, PriorityNode(priority=initialPriority, node=initialNode))
   
   explored = set()
   
-  #While the frontier is not empty
+  # While the frontier is not empty
   while frontier:
-    #Get the node with the lowest priority
+    # Get the node with the lowest priority
     currentPriorityNode = heapq.heappop(frontier)
     currentNode = currentPriorityNode.node
     currentState = currentNode.state
-    #If the current state is the goal state, return the current node
+    
+    # If the current state is the goal state, return the current node
     if currentState.isGoal(totalCities=len(map.cities), startCity=startCity):
       return currentNode
-    #Add the current state to the explored set
+    
+    # Add the current state to the explored set
     stateId = (currentState.city.name, tuple(sorted(currentState.visited)))
-    #If the state is already in the explored set, continue
     if stateId in explored:
       continue
     explored.add(stateId)
     
-    #Expand the current node
+    # Expand the current node
     for child in currentNode.expand(map):
       childState = child.state
-      #If the child state is already in the explored set, continue
       if (childState.city.name, tuple(sorted(childState.visited))) in explored:
-        continue
-      #Calculate the priority of the child node
+          continue
       heuristic = minimumSpanningTree(map.cities, childState.visited)
       priority = heuristic + childState.cost
-      #Add the child node to the frontier
-      heapq.heappush(frontier, PriorityNode(priority = priority, node = child))
-      
-    return None
+      heapq.heappush(frontier, PriorityNode(priority=priority, node=child))
+
+  # If no solution was found, return None after the loop finishes
+  return None
